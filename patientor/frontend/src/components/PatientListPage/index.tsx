@@ -1,49 +1,47 @@
 import { useState } from "react";
-import { Box, Table, Button, TableHead, Typography, TableCell, TableRow, TableBody } from '@mui/material';
-import axios from 'axios';
+import { Link } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 
-import { PatientFormValues, Patient } from "../../types";
+import type {
+  NonSensitivePatient,
+  PatientFormValues,
+} from "../../types";
 import AddPatientModal from "../AddPatientModal";
-
 import HealthRatingBar from "../HealthRatingBar";
-
 import patientService from "../../services/patients";
+import { getErrorMessage } from "../../utils";
 
 interface Props {
-  patients : Patient[]
-  setPatients: React.Dispatch<React.SetStateAction<Patient[]>>
+  patients: NonSensitivePatient[];
+  setPatients: React.Dispatch<React.SetStateAction<NonSensitivePatient[]>>;
 }
 
-const PatientListPage = ({ patients, setPatients } : Props ) => {
-
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+const PatientListPage = ({ patients, setPatients }: Props) => {
+  const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState<string>();
-
-  const openModal = (): void => setModalOpen(true);
 
   const closeModal = (): void => {
     setModalOpen(false);
     setError(undefined);
   };
 
-  const submitNewPatient = async (values: PatientFormValues) => {
+  const submitNewPatient = async (values: PatientFormValues): Promise<void> => {
     try {
       const patient = await patientService.create(values);
-      setPatients(patients.concat(patient));
+      setPatients((currentPatients) => currentPatients.concat(patient));
       setModalOpen(false);
-    } catch (e: unknown) {
-      if (axios.isAxiosError(e)) {
-        if (e?.response?.data && typeof e?.response?.data === "string") {
-          const message = e.response.data.replace('Something went wrong. Error: ', '');
-          console.error(message);
-          setError(message);
-        } else {
-          setError("Unrecognized axios error");
-        }
-      } else {
-        console.error("Unknown error", e);
-        setError("Unknown error");
-      }
+      setError(undefined);
+    } catch (caughtError: unknown) {
+      setError(getErrorMessage(caughtError));
     }
   };
 
@@ -64,9 +62,11 @@ const PatientListPage = ({ patients, setPatients } : Props ) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {Object.values(patients).map((patient: Patient) => (
+          {patients.map((patient) => (
             <TableRow key={patient.id}>
-              <TableCell>{patient.name}</TableCell>
+              <TableCell>
+                <Link to={`/patients/${patient.id}`}>{patient.name}</Link>
+              </TableCell>
               <TableCell>{patient.gender}</TableCell>
               <TableCell>{patient.occupation}</TableCell>
               <TableCell>
@@ -82,7 +82,7 @@ const PatientListPage = ({ patients, setPatients } : Props ) => {
         error={error}
         onClose={closeModal}
       />
-      <Button variant="contained" onClick={() => openModal()}>
+      <Button variant="contained" onClick={() => setModalOpen(true)}>
         Add New Patient
       </Button>
     </div>
