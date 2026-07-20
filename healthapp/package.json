@@ -1,0 +1,27 @@
+{
+  "name": "healthapp",
+  "version": "1.0.0",
+  "description": "Full Stack Open TypeScript exercises 9.1-9.7",
+  "license": "ISC",
+  "type": "module",
+  "scripts": {
+    "calculateBmi": "node --experimental-transform-types bmiCalculator.ts",
+    "calculateExercises": "node --experimental-transform-types exerciseCalculator.ts",
+    "tsc": "tsc",
+    "start": "node --experimental-transform-types index.ts",
+    "dev": "concurrently \"tsc --watch\" \"node --watch --experimental-transform-types index.ts\"",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/express": "^5.0.6",
+    "concurrently": "^9.2.1",
+    "eslint": "^10.1.0",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.57.2"
+  }
+}
